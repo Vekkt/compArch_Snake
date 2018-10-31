@@ -34,8 +34,10 @@ clear_leds:
 set_pixel:
     addi t0, r0, 1      ; t0 = 1
     sll t0, t0, a1      ; t0 = 1 << y
-    ldb t1, LEDS (a0)   ; t1 = MEM[0x2000 + x](7:0)
-    or t1, t1, t0       ; t1 = MEM[0x2000 + x](7:0) or (1 << y)
-    stb t1, LEDS (a0)   ; MEM[0x2000 + x](7:0) = t1
+    ldw t1, LEDS (a0)   ; t1 = MEM[0x2000 + x]
+    or t1, t1, t0       ; t1 = MEM[0x2000 + x] or (1 << y)
+    stw t1, LEDS (a0)   ; MEM[0x2000 + x] = t1
     ret
 ; END:set_pixel
+
+j'n'ai aucune peine j'te nique ta race
