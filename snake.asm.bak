@@ -12,10 +12,42 @@
 ; BEGIN:main
 main:
     call clear_leds
-    addi a0, r0, 5
+    addi a0, r0, 0
+    addi a1, r0, 0
+    call set_pixel
+    addi a0, r0, 1
+    addi a1, r0, 1
+    call set_pixel
+    addi a0, r0, 2
+    addi a1, r0, 2
+    call set_pixel
+    addi a0, r0, 3
     addi a1, r0, 3
     call set_pixel
-	ret
+    addi a0, r0, 4
+    addi a1, r0, 4
+    call set_pixel
+    addi a0, r0, 5
+    addi a1, r0, 5
+    call set_pixel
+    addi a0, r0, 6
+    addi a1, r0, 6
+    call set_pixel
+    addi a0, r0, 7
+    addi a1, r0, 7
+    call set_pixel
+    addi a0, r0, 8
+    addi a1, r0, 0
+    call set_pixel
+    addi a0, r0, 9
+    addi a1, r0, 1
+    call set_pixel
+    addi a0, r0, 10
+    addi a1, r0, 2
+    call set_pixel
+    addi a0, r0, 11
+    addi a1, r0, 3
+    call set_pixel
 ; END:main
 
 ; BEGIN:clear_leds
