@@ -33,9 +33,9 @@ set_pixel:
 	andi t2, a0, 7		; t2 = x % 8
     slli t2, t2, 3      ; t2 = x * 8
     add  t2, t2, a1     ; t2 = y + x * 8
-    sll  t0, t0, t2     ; t0 = 1 << y
+    sll  t0, t0, t2     ; t0 = 1 << t2
     ldw  t1, LEDS (a0)  ; t1 = MEM[0x2000 + x]
-    or   t1, t1, t0     ; t1 = MEM[0x2000 + x] or (1 << y)
+    or   t1, t1, t0     ; t1 = MEM[0x2000 + x] or (1 << t2)
     stw  t1, LEDS (a0)  ; MEM[0x2000 + x] = t1
     ret
 ; END:set_pixel
