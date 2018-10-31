@@ -39,5 +39,3 @@ set_pixel:
     stw t1, LEDS (a0)   ; MEM[0x2000 + x] = t1
     ret
 ; END:set_pixel
-
-j'n'ai aucune peine j'te nique ta race
