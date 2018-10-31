@@ -20,13 +20,10 @@ main:
 
 ; BEGIN:clear_leds
 clear_leds:
-    addi t0, r0, LEDS
-    stw r0, 0x0 (t0)
-    stw r0, 0x2 (t0)
-    stw r0, 0x4 (t0)
-    stw r0, 0x6 (t0)
-    stw r0, 0x8 (t0)
-    stw r0, 0xA (t0)
+    addi t0, r0, LEDS   ; t0 = 0x2000
+    stw r0, 0x0 (t0)    ; LED[0] = 0
+    stw r0, 0x4 (t0)    ; LED[1] = 0
+    stw r0, 0x8 (t0)    ; LED[2] = 0
     ret
 ; END:clear_leds
 
@@ -34,10 +31,10 @@ clear_leds:
 set_pixel:
     addi t0, r0, 1      ; t0 = 1
     slli t2, a0, 3      ; t2 = x * 8
-    add t2, t2, a0      ; t2 = y + x * 8
-    sll t0, t0, t2      ; t0 = 1 << y
-    ldw t1, LEDS (a0)   ; t1 = MEM[0x2000 + x]
-    or t1, t1, t0       ; t1 = MEM[0x2000 + x] or (1 << y)
-    stw t1, LEDS (a0)   ; MEM[0x2000 + x] = t1
+    add  t2, t2, a0     ; t2 = y + x * 8
+    sll  t0, t0, t2     ; t0 = 1 << y
+    ldw  t1, LEDS (a0)  ; t1 = MEM[0x2000 + x]
+    or   t1, t1, t0     ; t1 = MEM[0x2000 + x] or (1 << y)
+    stw  t1, LEDS (a0)  ; MEM[0x2000 + x] = t1
     ret
 ; END:set_pixel
