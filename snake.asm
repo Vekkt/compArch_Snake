@@ -12,7 +12,8 @@
 ; BEGIN:main
 main:
     call clear_leds
-
+    addi a0, r0, 5
+    addi a1, r0, 3
     call set_pixel
     ret
 ; END:main
@@ -30,7 +31,7 @@ clear_leds:
 
 ; BEGIN:set_pixel
 set_pixel:
-    addi t0, 1, 0       ; t0 = 1
+    addi t0, r0, 1      ; t0 = 1
     sll t0, t0, a1      ; t0 = 1 << y
     ldb t1, LEDS (a0)   ; t1 = MEM[0x2000 + x](7:0)
     or t1, t1, t0       ; t1 = MEM[0x2000 + x](7:0) or (1 << y)
