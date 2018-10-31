@@ -20,12 +20,12 @@ main:
 
 ; BEGIN:clear_leds
 clear_leds:
-    stw 0, LEDS (0x0)
-    stw 0, LEDS (0x2)
-    stw 0, LEDS (0x4)
-    stw 0, LEDS (0x6)
-    stw 0, LEDS (0x8)
-    stw 0, LEDS (0xA)
+    stw r0, LEDS (0x0)
+    stw r0, LEDS (0x2)
+    stw r0, LEDS (0x4)
+    stw r0, LEDS (0x6)
+    stw r0, LEDS (0x8)
+    stw r0, LEDS (0xA)
     ret
 ; END:clear_leds
 
