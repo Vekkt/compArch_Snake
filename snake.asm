@@ -12,13 +12,20 @@
 ; BEGIN:clear_leds
 clear_leds:
     stw 0, LEDS (0x0)
+    stw 0, LEDS (0x2)
     stw 0, LEDS (0x4)
+    stw 0, LEDS (0x6)
     stw 0, LEDS (0x8)
+    stw 0, LEDS (0xA)
     ret
 ; END:clear_leds
 
 ; BEGIN:set_pixel
 set_pixel:
-    ; ...
+    mov t0, 1           ; t0 = 1
+    sll t1, t0, a1      ; t1 = 1 << y
+    ldb t3, LEDS (a0)   ; t3 = b
+    or t4, t3, t1       ; t4 = t3 or t1
+    stb t4, LEDS (a0)   ; LEDS + t2 = t4
     ret
 ; END:set_pixel
