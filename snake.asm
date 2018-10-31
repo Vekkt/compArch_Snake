@@ -9,6 +9,14 @@
 .equ RANDOM_NUM,  0x2010 ; Random number generator address
 .equ BUTTONS,     0x2030 ; Button addresses
 
+; BEGIN:main
+main:
+    call clear_leds
+
+    call set_pixel
+    ret
+; END:main
+
 ; BEGIN:clear_leds
 clear_leds:
     stw 0, LEDS (0x0)
@@ -22,7 +30,7 @@ clear_leds:
 
 ; BEGIN:set_pixel
 set_pixel:
-    mov t0, 1           ; t0 = 1
+    addi t0, 1, 0       ; t0 = 1
     sll t0, t0, a1      ; t0 = 1 << y
     ldb t1, LEDS (a0)   ; t1 = MEM[0x2000 + x](7:0)
     or t1, t1, t0       ; t1 = MEM[0x2000 + x](7:0) or (1 << y)
