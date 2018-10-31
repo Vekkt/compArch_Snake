@@ -23,9 +23,9 @@ clear_leds:
 ; BEGIN:set_pixel
 set_pixel:
     mov t0, 1           ; t0 = 1
-    sll t1, t0, a1      ; t1 = 1 << y
-    ldb t3, LEDS (a0)   ; t3 = MEM[0x2000 + x](7:0)
-    or t4, t3, t1       ; t4 = t3 or t1
-    stb t4, LEDS (a0)   ; MEM[0x2000 + x](7:0) = t4
+    sll t0, t0, a1      ; t0 = 1 << y
+    ldb t1, LEDS (a0)   ; t1 = MEM[0x2000 + x](7:0)
+    or t1, t1, t0       ; t1 = MEM[0x2000 + x](7:0) or (1 << y)
+    stb t1, LEDS (a0)   ; MEM[0x2000 + x](7:0) = t1
     ret
 ; END:set_pixel
