@@ -11,8 +11,10 @@
 
 ; BEGIN:clear_leds
 clear_leds:
-    ; ...
-ret
+    stw 0, LEDS (0x0)
+    stw 0, LEDS (0x4)
+    stw 0, LEDS (0x8)
+    ret
 ; END:clear_leds
 
 ; BEGIN:set_pixel
