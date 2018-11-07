@@ -12,22 +12,21 @@
 
 ; BEGIN:main
 main:
-    addi sp, r0, LEDS  ; initi sp
-    call clear_leds ; clear screen
+    addi sp, r0, LEDS   ; initi sp
 
-    addi t6, r0, 1
-    addi t3, r0, 0
-    stw  t6, GSA (t3)
-    addi t3, r0, 136
-    stw  t6, GSA (t3)
-    addi t3, r0, 172
-    stw  t6, GSA (t3)
-    addi t3, r0, 208
-    stw  t6, GSA (t3)
-    addi t3, r0, 244
-    stw  t6, GSA (t3)
-    
-    call draw_array
+    ; init snake
+    addi t0, r0, 4      ; t0 = 4
+    stw  r0, HEAD_X (0) ; snake head x = 0
+    stw  r0, HEAD_Y (0) ; snake head y = 0
+    stw  r0, TAIL_X (0) ; snake tail x = 0
+    stw  r0, TAIL_Y (0) ; snake tail y = 0
+    stw  t0, GSA (0)    ; GSA[0][0] = 4
+step:
+    call clear_leds     ; clear screen
+    call get_input      ; button pressed
+    call move_snake     ; change direction
+    call draw_array     ; draw board
+    br step             ; cycle
 	ret
 ; END:main
 
