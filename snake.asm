@@ -16,11 +16,11 @@ main:
 
     ; init snake
     addi t0, r0, 4      ; t0 = 4
-    stw  r0, HEAD_X (0) ; snake head x = 0
-    stw  r0, HEAD_Y (0) ; snake head y = 0
-    stw  r0, TAIL_X (0) ; snake tail x = 0
-    stw  r0, TAIL_Y (0) ; snake tail y = 0
-    stw  t0, GSA (0)    ; GSA[0][0] = 4
+    stw  r0, HEAD_X (r0) ; snake head x = 0
+    stw  r0, HEAD_Y (r0) ; snake head y = 0
+    stw  r0, TAIL_X (r0) ; snake tail x = 0
+    stw  r0, TAIL_Y (r0) ; snake tail y = 0
+    stw  t0, GSA (r0)    ; GSA[0][0] = 4
 step:
     call clear_leds     ; clear screen
     call get_input      ; button pressed
@@ -54,13 +54,18 @@ set_pixel:
     ret
 ; END:set_pixel
 
+; BEGIN:move_snake
+move_snake:
+	ret
+; END:set_pixel
+
 ; BEGIN:get_input
 get_input:
-    addi t0, r0, EDGE_CAPT  ; t0 = edgecapture
+	ldw  t0, EDGE_CAPT (r0)	; t0 = edge_capture
     andi t0, t0, 31         ; t0 = edgecapture[0:5]
     beq  t0, r0, return     ; button pressed ? if no end
     addi t4, r0, 1          ; position tester (= 1)
-    add  t6, r0, r0         ; position (= 0)
+    addi t6, r0, 1          ; position (= 1)
 index:
     and  t5, t4, t0         ; t5 = t4 & t0
     bne  t5, r0, update     ; if t5 != 0 we found the index
@@ -68,12 +73,12 @@ index:
     addi t6, t6, 1          ; and incr pos
     br   index
 update:
-    addi t1, r0, HEAD_X     ; t1 = head_x
-    addi t2, r0, HEAD_Y     ; t2 = head_y
+    ldw  t1, HEAD_X (r0)   	; t1 = head_x
+    ldw  t2, HEAD_Y (r0)    ; t2 = head_y
     slli t3, t1, 3          ; t3 = x * 8
     add  t3, t3, t2         ; t3 = x * 8 + y
     slli t3, t3, 2          ; t3 = t3 * 4
-    stw  t6, GSA (t3)       ; MEM[GSA + t3] = t0
+    stw  t6, GSA (t3)       ; MEM[GSA + t3] = t6
 return:
     ret
 ; END:get_input

@@ -12,22 +12,21 @@
 
 ; BEGIN:main
 main:
-    addi sp, r0, LEDS  ; initi sp
-    call clear_leds ; clear screen
+    addi sp, r0, LEDS   ; initi sp
 
-    addi t6, r0, 1
-    addi t3, r0, 0
-    stw  t6, GSA (t3)
-    addi t3, r0, 136
-    stw  t6, GSA (t3)
-    addi t3, r0, 172
-    stw  t6, GSA (t3)
-    addi t3, r0, 208
-    stw  t6, GSA (t3)
-    addi t3, r0, 244
-    stw  t6, GSA (t3)
-    
-    call draw_array
+    ; init snake
+    addi t0, r0, 4      ; t0 = 4
+    stw  r0, HEAD_X (r0) ; snake head x = 0
+    stw  r0, HEAD_Y (r0) ; snake head y = 0
+    stw  r0, TAIL_X (r0) ; snake tail x = 0
+    stw  r0, TAIL_Y (r0) ; snake tail y = 0
+    stw  t0, GSA (r0)    ; GSA[0][0] = 4
+step:
+    call clear_leds     ; clear screen
+    call get_input      ; button pressed
+    call move_snake     ; change direction
+    call draw_array     ; draw board
+    br step             ; cycle
 	ret
 ; END:main
 
@@ -42,10 +41,12 @@ clear_leds:
 
 ; BEGIN:set_pixel
 set_pixel:
+    ; compute position
     addi t0, r0, 1      ; t0 = 1
 	andi t2, a0, 7		; t2 = x % 8
     slli t2, t2, 3      ; t2 = x * 8
     add  t2, t2, a1     ; t2 = y + x * 8
+
     sll  t0, t0, t2     ; t0 = 1 << t2
     ldw  t1, LEDS (a0)  ; t1 = MEM[LEDS + x]
     or   t1, t1, t0     ; t1 = MEM[LEDS + x] or (1 << t2)
@@ -53,13 +54,18 @@ set_pixel:
     ret
 ; END:set_pixel
 
+; BEGIN:move_snake
+move_snake:
+	ret
+; END:set_pixel
+
 ; BEGIN:get_input
 get_input:
-    addi t0, r0, EDGE_CAPT  ; t0 = edgecapture
+	ldw  t0, EDGE_CAPT (r0)	; t0 = edge_capture
     andi t0, t0, 31         ; t0 = edgecapture[0:5]
     beq  t0, r0, return     ; button pressed ? if no end
     addi t4, r0, 1          ; position tester (= 1)
-    add  t6, r0, r0         ; position (= 0)
+    addi t6, r0, 1          ; position (= 1)
 index:
     and  t5, t4, t0         ; t5 = t4 & t0
     bne  t5, r0, update     ; if t5 != 0 we found the index
@@ -67,10 +73,11 @@ index:
     addi t6, t6, 1          ; and incr pos
     br   index
 update:
-    addi t1, r0, HEAD_X     ; t1 = head_x
-    addi t2, r0, HEAD_Y     ; t2 = head_y
+    ldw  t1, HEAD_X (r0)   	; t1 = head_x
+    ldw  t2, HEAD_Y (r0)    ; t2 = head_y
     slli t3, t1, 3          ; t3 = x * 8
     add  t3, t3, t2         ; t3 = x * 8 + y
+    slli t3, t3, 2          ; t3 = t3 * 4
     stw  t6, GSA (t3)       ; MEM[GSA + t3] = t0
 return:
     ret
@@ -87,34 +94,40 @@ lpx:
     add t4, r0, r0          ; t4 = y = 0
 lpy:
     beq t4, t6, end_lpy     ; if y == 8 break
+
+    ; save position
     addi sp, sp, -12        ; make space on stack
 	stw  ra, 8 (sp)			; push ra
     stw  t3, 4 (sp)         ; push t3
     stw  t4, 0 (sp)         ; push t4
+
+    ; set args
     add  a0, t3, r0         ; put t3 in a0
     add  a1, t4, r0         ; put t4 in a1
 
-    andi t0, t3, 7     		; t2 = x % 8
-    slli t0, t0, 3     		; t2 = x * 8
-    add  t0, t0, t4     	; t2 = y + x * 8
-	slli t0, t0, 2
-	addi t0, t0, GSA
+    ; compute address shift
+    slli t0, t3, 3     		; t0 = x * 8
+    add  t0, t0, t4     	; t0 = y + x * 8
+	slli t0, t0, 2          ; t0 = t0 * 4
+	addi t0, t0, GSA        ; t0 = GSA + t0
+
+    ; get LED value
     ldw  t0, 0 (t0)         ; t0 = GSA[x][y]
-	andi t0, t0, 15	
+	andi t0, t0, 15	        ; take the first 8 bits
     beq t0, r0, next        ; if GSA[x][y] == 0 then dont set_pixel
-    call set_pixel          
-	
+    call set_pixel          ; else draw the pixel
 next:
-	ldw ra, 8 (sp)
+    ; retrieve old values
+	ldw ra, 8 (sp)          ; pop the return address
     ldw t3, 4 (sp)          ; pop x into t3
     ldw t4, 0 (sp)          ; pop y into t4
-    addi sp, sp, 12          ; hand back space on stack
+    addi sp, sp, 12         ; hand back space on stack
+
     addi t4, t4, 1          ; incr y
     br lpy                  ; loop on y coordinate
 end_lpy:
     addi t3, t3, 1          ; incr x
     br lpx                  ; loop on x coordinate
 end_lpx:
-	
     ret
 ; END:draw_array
