@@ -15,12 +15,16 @@ main:
     addi sp, r0, LEDS   ; initi sp
 
     ; init snake
-    addi t0, r0, 4      ; t0 = 4
-    stw  r0, HEAD_X (r0) ; snake head x = 0
-    stw  r0, HEAD_Y (r0) ; snake head y = 0
-    stw  r0, TAIL_X (r0) ; snake tail x = 0
-    stw  r0, TAIL_Y (r0) ; snake tail y = 0
-    stw  t0, GSA (r0)    ; GSA[0][0] = 4
+    stw  r0, HEAD_X (r0)    ; snake head x = 0
+    stw  r0, HEAD_Y (r0)    ; snake head y = 0
+    stw  r0, TAIL_X (r0)    ; snake tail x = 0
+    stw  r0, TAIL_Y (r0)    ; snake tail y = 0
+	addi t0, r0, 4          ; t0 = 4
+    stw  t0, GSA (r0)       ; GSA[0][0] = 4
+
+    call create_food        ; create first food
+    call draw_array         ; draw board
+
 step:
     call clear_leds     ; clear screen
     call get_input      ; button pressed
@@ -39,6 +43,27 @@ clear_leds:
     ret
 ; END:clear_leds
 
+; BEGIN:create_food
+create_food:
+	; get random pos
+    ldw  t0, RANDOM_NUM (r0)    ; t0 = random pos
+    andi t0, t0, 255            ; t0 = low byte of t0
+
+    ; check pos validity
+    addi t1, r0, 96             ; t1 = 96
+    bge  t0, t1, create_food    ; if t0 >= 96: invalid pos
+
+	slli t1, t0, 2				; t1 = t0 * 4
+	ldw  t1, GSA (t1)			; t1 = MEM[GSA + t1]
+	bne  t1, r0, create_food    ; if t1 != 0: invalid pos
+
+    ; create food
+    slli t0, t0, 2              ; t0 = t0 * 4
+    addi t1, r0, 5              ; t1 = 5
+    stw  t1, GSA (t0)           ; MEM[GSA + t0] = 5
+    ret
+; END:create_food
+
 ; BEGIN:set_pixel
 set_pixel:
     ; compute position
@@ -54,25 +79,21 @@ set_pixel:
     ret
 ; END:set_pixel
 
-; BEGIN:move_snake
-move_snake:
-	ret
-; END:set_pixel
-
 ; BEGIN:get_input
 get_input:
 	ldw  t0, EDGE_CAPT (r0)	; t0 = edge_capture
     andi t0, t0, 31         ; t0 = edgecapture[0:5]
     beq  t0, r0, return     ; button pressed ? if no end
+	stw  r0, EDGE_CAPT (r0) ; reset edge capture
     addi t4, r0, 1          ; position tester (= 1)
     addi t6, r0, 1          ; position (= 1)
 index:
     and  t5, t4, t0         ; t5 = t4 & t0
-    bne  t5, r0, update     ; if t5 != 0 we found the index
+    bne  t5, r0, set        ; if t5 != 0 we found the index
     slli t4, t4, 1          ; else shift t4 by 1 to the left
     addi t6, t6, 1          ; and incr pos
     br   index
-update:
+set:
     ldw  t1, HEAD_X (r0)   	; t1 = head_x
     ldw  t2, HEAD_Y (r0)    ; t2 = head_y
     slli t3, t1, 3          ; t3 = x * 8
