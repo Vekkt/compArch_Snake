@@ -118,7 +118,7 @@ lpy:
 
     ; save position
     addi sp, sp, -12        ; make space on stack
-    stw  ra, 8 (sp)	        ; push ra
+    stw  ra, 8 (sp)         ; push ra
     stw  t3, 4 (sp)         ; push t3
     stw  t4, 0 (sp)         ; push t4
 
@@ -127,14 +127,14 @@ lpy:
     add  a1, t4, r0         ; put t4 in a1
 
     ; compute address shift
-    slli t0, t3, 3	        ; t0 = x * 8
-    add  t0, t0, t4	        ; t0 = y + x * 8
+    slli t0, t3, 3          ; t0 = x * 8
+    add  t0, t0, t4         ; t0 = y + x * 8
     slli t0, t0, 2          ; t0 = t0 * 4
     addi t0, t0, GSA        ; t0 = GSA + t0
 
     ; get LED value
     ldw  t0, 0 (t0)         ; t0 = GSA[x][y]
-    andi t0, t0, 15	        ; take the first 8 bits
+    andi t0, t0, 15         ; take the first 8 bits
     beq t0, r0, next        ; if GSA[x][y] == 0 then dont set_pixel
     call set_pixel          ; else draw the pixel
 next:
