@@ -68,7 +68,7 @@ create_food:
 set_pixel:
     ; compute position
     addi t0, r0, 1      ; t0 = 1
-    andi t2, a0, 7	    ; t2 = x % 8
+    andi t2, a0, 7      ; t2 = x % 8
     slli t2, t2, 3      ; t2 = x * 8
     add  t2, t2, a1     ; t2 = y + x * 8
 
