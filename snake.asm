@@ -53,8 +53,8 @@ create_food:
     addi t1, r0, 96             ; t1 = 96
     bge  t0, t1, create_food    ; if t0 >= 96: invalid pos
 
-    slli t1, t0, 2		        ; t1 = t0 * 4
-    ldw  t1, GSA (t1)		    ; t1 = MEM[GSA + t1]
+    slli t1, t0, 2              ; t1 = t0 * 4
+    ldw  t1, GSA (t1)           ; t1 = MEM[GSA + t1]
     bne  t1, r0, create_food    ; if t1 != 0: invalid pos
 
     ; create food
