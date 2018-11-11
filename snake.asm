@@ -12,7 +12,7 @@
 
 ; BEGIN:main
 main:
-    addi sp, r0, LEDS   ; initi sp
+    addi sp, r0, LEDS       ; initi sp
 
     ; init snake
     stw  r0, HEAD_X (r0)    ; snake head x = 0
