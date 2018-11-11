@@ -19,7 +19,7 @@ main:
     stw  r0, HEAD_Y (r0)    ; snake head y = 0
     stw  r0, TAIL_X (r0)    ; snake tail x = 0
     stw  r0, TAIL_Y (r0)    ; snake tail y = 0
-	addi t0, r0, 4          ; t0 = 4
+    addi t0, r0, 4          ; t0 = 4
     stw  t0, GSA (r0)       ; GSA[0][0] = 4
 
     call create_food        ; create first food
@@ -31,7 +31,7 @@ step:
     call move_snake     ; change direction
     call draw_array     ; draw board
     br step             ; cycle
-	ret
+    ret
 ; END:main
 
 ; BEGIN:clear_leds
@@ -45,7 +45,7 @@ clear_leds:
 
 ; BEGIN:create_food
 create_food:
-	; get random pos
+    ; get random pos
     ldw  t0, RANDOM_NUM (r0)    ; t0 = random pos
     andi t0, t0, 255            ; t0 = low byte of t0
 
@@ -53,9 +53,9 @@ create_food:
     addi t1, r0, 96             ; t1 = 96
     bge  t0, t1, create_food    ; if t0 >= 96: invalid pos
 
-	slli t1, t0, 2				; t1 = t0 * 4
-	ldw  t1, GSA (t1)			; t1 = MEM[GSA + t1]
-	bne  t1, r0, create_food    ; if t1 != 0: invalid pos
+    slli t1, t0, 2		; t1 = t0 * 4
+    ldw  t1, GSA (t1)		; t1 = MEM[GSA + t1]
+    bne  t1, r0, create_food    ; if t1 != 0: invalid pos
 
     ; create food
     slli t0, t0, 2              ; t0 = t0 * 4
@@ -68,7 +68,7 @@ create_food:
 set_pixel:
     ; compute position
     addi t0, r0, 1      ; t0 = 1
-	andi t2, a0, 7		; t2 = x % 8
+    andi t2, a0, 7	; t2 = x % 8
     slli t2, t2, 3      ; t2 = x * 8
     add  t2, t2, a1     ; t2 = y + x * 8
 
@@ -81,10 +81,10 @@ set_pixel:
 
 ; BEGIN:get_input
 get_input:
-	ldw  t0, EDGE_CAPT (r0)	; t0 = edge_capture
+    ldw  t0, EDGE_CAPT (r0) ; t0 = edge_capture
     andi t0, t0, 31         ; t0 = edgecapture[0:5]
     beq  t0, r0, return     ; button pressed ? if no end
-	stw  r0, EDGE_CAPT (r0) ; reset edge capture
+    stw  r0, EDGE_CAPT (r0) ; reset edge capture
     addi t4, r0, 1          ; position tester (= 1)
     addi t6, r0, 1          ; position (= 1)
 index:
@@ -94,7 +94,7 @@ index:
     addi t6, t6, 1          ; and incr pos
     br   index
 set:
-    ldw  t1, HEAD_X (r0)   	; t1 = head_x
+    ldw  t1, HEAD_X (r0)    ; t1 = head_x
     ldw  t2, HEAD_Y (r0)    ; t2 = head_y
     slli t3, t1, 3          ; t3 = x * 8
     add  t3, t3, t2         ; t3 = x * 8 + y
@@ -118,7 +118,7 @@ lpy:
 
     ; save position
     addi sp, sp, -12        ; make space on stack
-	stw  ra, 8 (sp)			; push ra
+    stw  ra, 8 (sp)	    ; push ra
     stw  t3, 4 (sp)         ; push t3
     stw  t4, 0 (sp)         ; push t4
 
@@ -127,19 +127,19 @@ lpy:
     add  a1, t4, r0         ; put t4 in a1
 
     ; compute address shift
-    slli t0, t3, 3     		; t0 = x * 8
-    add  t0, t0, t4     	; t0 = y + x * 8
-	slli t0, t0, 2          ; t0 = t0 * 4
-	addi t0, t0, GSA        ; t0 = GSA + t0
+    slli t0, t3, 3	    ; t0 = x * 8
+    add  t0, t0, t4	    ; t0 = y + x * 8
+    slli t0, t0, 2          ; t0 = t0 * 4
+    addi t0, t0, GSA        ; t0 = GSA + t0
 
     ; get LED value
     ldw  t0, 0 (t0)         ; t0 = GSA[x][y]
-	andi t0, t0, 15	        ; take the first 8 bits
+    andi t0, t0, 15	    ; take the first 8 bits
     beq t0, r0, next        ; if GSA[x][y] == 0 then dont set_pixel
     call set_pixel          ; else draw the pixel
 next:
     ; retrieve old values
-	ldw ra, 8 (sp)          ; pop the return address
+    ldw ra, 8 (sp)          ; pop the return address
     ldw t3, 4 (sp)          ; pop x into t3
     ldw t4, 0 (sp)          ; pop y into t4
     addi sp, sp, 12         ; hand back space on stack
