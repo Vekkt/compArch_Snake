@@ -111,7 +111,7 @@ set_pixel:
 get_input:
     ldw  t0, EDGE_CAPT (r0)	; t0 = edge_capture
     andi t0, t0, 31		; t0 = edgecapture[0:5]
-    beq  t0, r0, return       ; button pressed ? if no end
+    beq  t0, r0, return        ; button pressed ? if no end
     stw  r0, EDGE_CAPT (r0)	; reset edge capture
     addi t4, r0, 1		; position tester (= 1)
     addi t6, r0, 1		; position (= 1)
@@ -139,10 +139,10 @@ draw_array:
     addi t5, r0, 12		; max x = 12
     addi t6, r0, 8		; max y = 8
 lpx:
-    beq t3, t5, end_lpx       ; if x == 12 break
+    beq t3, t5, end_lpx        ; if x == 12 break
     add t4, r0, r0		; t4 = y = 0
 lpy:
-    beq t4, t6, end_lpy       ; if y == 8 break
+    beq t4, t6, end_lpy        ; if y == 8 break
 
     ; save position
     addi sp, sp, -12		; make space on stack
@@ -186,8 +186,8 @@ move_snake:
     add t7, r0, a0
 
     ; update head
-    addi a0, r0, HEAD_X       ; a0 = head_x
-    addi a1, r0, HEAD_Y       ; a1 = head_y
+    addi a0, r0, HEAD_X        ; a0 = head_x
+    addi a1, r0, HEAD_Y        ; a1 = head_y
     addi a2, r0, 0		; a2 = 0 (head)
     addi sp, sp, -4		; make space on stack
     stw  ra, 0 (sp)		; push ra
@@ -197,12 +197,12 @@ move_snake:
 
     ; update tail
     bne  t7, r0, end_move
-    addi a0, r0, TAIL_X       ; a0 = tail_x
-    addi a1, r0, TAIL_Y       ; a1 = tail_y
+    addi a0, r0, TAIL_X        ; a0 = tail_x
+    addi a1, r0, TAIL_Y        ; a1 = tail_y
     addi a2, r0, 1		; a2 = 1 (tail)
     addi sp, sp, -4		; make space on stack
     stw  ra, 0 (sp)		; push ra
-    call update               ; update tail position
+    call update                ; update tail position
     ldw ra, 0 (sp)		; pop the return address
     addi sp, sp, 4		; hand back space on stack
 end_move:
@@ -223,7 +223,7 @@ update:
     andi t4, t4, 15		; take the first 8 bits
 
     beq a2, r0, start_move	; need to delete tail if head
-    stw	r0, 0 (t0)            ; clear tail
+    stw	r0, 0 (t0)             ; clear tail
 start_move:
     ;compute x offset
     cmpeqi t3, t4, 4		; if t4 = 4 then x_os = 1
@@ -259,8 +259,8 @@ end_update:
 
 ; BEGIN: hit_test
 hit_test:
-    ldw t1, HEAD_X (r0)       ; get x pos
-    ldw t2, HEAD_Y (r0)       ; get y pos
+    ldw t1, HEAD_X (r0)        ; get x pos
+    ldw t2, HEAD_Y (r0)        ; get y pos
 
     ; compute LED address
     slli t0, t1, 3		; t0 = x * 8
@@ -293,7 +293,7 @@ upd_y:
     or t3, t3, t4		; t0 = t0 || t1
 	
     addi v0, r0, 2		; v0 = 2 by default
-    bne t3, r0, end_hit       ; if out of bounds, end game
+    bne t3, r0, end_hit        ; if out of bounds, end game
 
     ; compute LED address
     slli t0, t1, 3		; t0 = x * 8
@@ -312,7 +312,7 @@ display_score:
     add t1, r0, r0		; t1 = 0
     addi t2, r0, 10		; t2 = 0
 split:
-    blt t0, t2, display       ; if t0 < 10 display score
+    blt t0, t2, display        ; if t0 < 10 display score
     addi t0, t0, -10		; else t0 = t0 - 10
     addi t1, t1, 1		; t1 = t1 + 1
     br split			; loop
