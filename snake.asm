@@ -27,12 +27,12 @@ main:
     call display_score
 
 step:
-    call clear_leds     		; clear screen
-    call get_input      		; button pressed
-    call hit_test				; check for collision
-    addi t0, r0, 2				; t0 = 2
-    bne  v0, t0, not_lost		; if v0 != 2, game continues
-    addi ra, r0, end_game		; ra = end_game
+    call clear_leds     	; clear screen
+    call get_input      	; button pressed
+    call hit_test		; check for collision
+    addi t0, r0, 2		; t0 = 2
+    bne  v0, t0, not_lost	; if v0 != 2, game continues
+    addi ra, r0, end_game	; ra = end_game
     br end_game
 not_lost:
     beq v0, r0, move            ; if v0 = 0, move
@@ -42,12 +42,12 @@ not_lost:
     stw t0, SCORE (r0)          ; MEM[SCORE] = score + 1
     call display_score
 move:
-    add a0, r0, v0 				; a0 = v0
-    call move_snake     		; change direction
-    call draw_array     		; draw board
+    add a0, r0, v0 		; a0 = v0
+    call move_snake     	; change direction
+    call draw_array     	; draw board
     call wait
     call restart_game
-    br step             		; cycle
+    br step             	; cycle
 end_game:
     call restart_game
     ret
@@ -190,8 +190,8 @@ move_snake:
     addi a1, r0, HEAD_Y     ; a1 = head_y
     addi a2, r0, 0    	    ; a2 = 0 (head)
     addi sp, sp, -4         ; make space on stack
-    stw  ra, 0 (sp)	    	; push ra
-    call update		    	; update head position
+    stw  ra, 0 (sp)	    ; push ra
+    call update		    ; update head position
     ldw ra, 0 (sp)          ; pop the return address
     addi sp, sp, 4          ; hand back space on stack
 
@@ -201,8 +201,8 @@ move_snake:
     addi a1, r0, TAIL_Y     ; a1 = tail_y
     addi a2, r0, 1    	    ; a2 = 1 (tail)
     addi sp, sp, -4         ; make space on stack
-    stw  ra, 0 (sp)	    	; push ra
-    call update		    	; update tail position
+    stw  ra, 0 (sp)	    ; push ra
+    call update		    ; update tail position
     ldw ra, 0 (sp)          ; pop the return address
     addi sp, sp, 4          ; hand back space on stack
 end_move:
@@ -220,14 +220,14 @@ update:
 	
     ; get LED value
     ldw  t4, 0 (t0)         ; t4 = GSA[x][y]
-    andi t4, t4, 15	    	; take the first 8 bits
+    andi t4, t4, 15	    ; take the first 8 bits
 
     beq a2, r0, start_move  ; need to delete tail if head
-    stw	r0, 0 (t0)	    	; clear tail
+    stw	r0, 0 (t0)	    ; clear tail
 start_move:
     ;compute x offset
     cmpeqi t3, t4, 4        ; if t4 = 4 then x_os = 1
-    addi t5, r0, 1	    	; t5 = 1
+    addi t5, r0, 1	    ; t5 = 1
     bne  t4, t5, update_x   ; if t4 = 1 then
     addi t3, r0, -1         ; x_os = -1
 update_x:
@@ -270,11 +270,11 @@ hit_test:
 	
     ; get LED value
     ldw  t4, 0 (t0)         ; t4 = GSA[x][y]
-    andi t4, t4, 15	    	; take the first 8 bits
+    andi t4, t4, 15	    ; take the first 8 bits
 
     ;compute x offset
     cmpeqi t3, t4, 4        ; if t4 = 4 then x_os = 1
-    addi t5, r0, 1	    	; t5 = 1
+    addi t5, r0, 1	    ; t5 = 1
     bne  t4, t5, upd_x      ; if t4 = 1 then
     addi t3, r0, -1         ; x_os = -1
 upd_x:
@@ -282,7 +282,7 @@ upd_x:
     
     ;compute y offset
     cmpeqi t3, t4, 3        ; if t4 = 3 then y_os = 1
-    addi t5, r0, 2	    	; t5 = 2
+    addi t5, r0, 2	    ; t5 = 2
     bne  t4, t5, upd_y      ; if t4 = 2 then
     addi t3, r0, -1         ; y_os = -1
 upd_y:
@@ -290,7 +290,7 @@ upd_y:
 
     cmpgeui t3, t1, 12	    ; t0 = 1 if x >= 12
     cmpgeui t4, t2, 8	    ; t1 = 1 if y >= 8
-    or t3, t3, t4	    	; t0 = t0 || t1
+    or t3, t3, t4	    ; t0 = t0 || t1
 	
     addi v0, r0, 2          ; v0 = 2 by default
     bne t3, r0, end_hit	    ; if out of bounds, end game
@@ -331,10 +331,10 @@ display:
 restart_game:
     ldw  t0, EDGE_CAPT (r0) ; t0 = edge_capture
     andi t0, t0, 31         ; t0 = edgecapture[0:5]
-    addi t4, r0, 1	    	; position tester (= 1)
+    addi t4, r0, 1	    ; position tester (= 1)
     slli t4, t4, 5          ; position tester (= 32)
-    and  t4, t4, t0	    	; t4 = t0 & t4
-    or   t4, t4, v0	    	; t4 = t4 | v0
+    and  t4, t4, t0	    ; t4 = t0 & t4
+    or   t4, t4, v0	    ; t4 = t4 | v0
     addi t0, r0, 2          ; t0 = 2
     blt  t4, t0, end_reset  ; if not reset and not lose, continue
     stw  r0, EDGE_CAPT (r0) ; reset edge capture
