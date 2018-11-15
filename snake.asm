@@ -223,7 +223,7 @@ update:
     andi t4, t4, 15		; take the first 8 bits
 
     beq a2, r0, start_move	; need to delete tail if head
-    stw	r0, 0 (t0)             ; clear tail
+    stw r0, 0 (t0)             ; clear tail
 start_move:
     ;compute x offset
     cmpeqi t3, t4, 4		; if t4 = 4 then x_os = 1
