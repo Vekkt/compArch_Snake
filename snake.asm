@@ -191,7 +191,7 @@ move_snake:
     addi a2, r0, 0		; a2 = 0 (head)
     addi sp, sp, -4		; make space on stack
     stw  ra, 0 (sp)		; push ra
-    call update			; update head position
+    call update	               ; update head position
     ldw ra, 0 (sp)		; pop the return address
     addi sp, sp, 4		; hand back space on stack
 
