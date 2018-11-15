@@ -22,21 +22,21 @@ main:
     addi t0, r0, 4              ; t0 = 4
     stw  t0, GSA (r0)           ; GSA[0][0] = 4
 
-    call create_food	        ; create apple
+    call create_food	          ; create apple
     call draw_array             ; draw board
     call display_score
 
 step:
-    call clear_leds     	; clear screen
-    call get_input      	; button pressed
-    call hit_test		; check for collision
-    addi t0, r0, 2		; t0 = 2
-    bne  v0, t0, not_lost	; if v0 != 2, game continues
-    addi ra, r0, end_game	; ra = end_game
+    call clear_leds     	  ; clear screen
+    call get_input      	  ; button pressed
+    call hit_test		  ; check for collision
+    addi t0, r0, 2		  ; t0 = 2
+    bne  v0, t0, not_lost	  ; if v0 != 2, game continues
+    addi ra, r0, end_game	  ; ra = end_game
     br end_game
 not_lost:
     beq v0, r0, move            ; if v0 = 0, move
-    call create_food	        ; else (v0 = 1) create apple
+    call create_food	          ; else (v0 = 1) create apple
     ldw t0, SCORE (r0)          ; t0 = score
     addi t0, t0, 1              ; t0 = score + 1
     stw t0, SCORE (r0)          ; MEM[SCORE] = score + 1
@@ -188,9 +188,9 @@ move_snake:
     ; update head
     addi a0, r0, HEAD_X     ; a0 = head_x
     addi a1, r0, HEAD_Y     ; a1 = head_y
-    addi a2, r0, 0    	    ; a2 = 0 (head)
+    addi a2, r0, 0          ; a2 = 0 (head)
     addi sp, sp, -4         ; make space on stack
-    stw  ra, 0 (sp)	    ; push ra
+    stw  ra, 0 (sp)	      ; push ra
     call update		    ; update head position
     ldw ra, 0 (sp)          ; pop the return address
     addi sp, sp, 4          ; hand back space on stack
@@ -199,9 +199,9 @@ move_snake:
     bne  t7, r0, end_move
     addi a0, r0, TAIL_X     ; a0 = tail_x
     addi a1, r0, TAIL_Y     ; a1 = tail_y
-    addi a2, r0, 1    	    ; a2 = 1 (tail)
+    addi a2, r0, 1    	     ; a2 = 1 (tail)
     addi sp, sp, -4         ; make space on stack
-    stw  ra, 0 (sp)	    ; push ra
+    stw  ra, 0 (sp)	     ; push ra
     call update		    ; update tail position
     ldw ra, 0 (sp)          ; pop the return address
     addi sp, sp, 4          ; hand back space on stack
@@ -213,14 +213,14 @@ update:
     ldw t2, 0 (a1)    	    ; get y pos
 
     ; compute LED address
-    slli t0, t1, 3     	    ; t0 = x * 8
+    slli t0, t1, 3     	; t0 = x * 8
     add  t0, t0, t2         ; t0 = y + x * 8
     slli t0, t0, 2          ; t0 = t0 * 4
     addi t0, t0, GSA        ; t0 = GSA + t0
 	
     ; get LED value
     ldw  t4, 0 (t0)         ; t4 = GSA[x][y]
-    andi t4, t4, 15	    ; take the first 8 bits
+    andi t4, t4, 15	     ; take the first 8 bits
 
     beq a2, r0, start_move  ; need to delete tail if head
     stw	r0, 0 (t0)	    ; clear tail
