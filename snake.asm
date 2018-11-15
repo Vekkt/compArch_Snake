@@ -22,7 +22,7 @@ main:
     addi t0, r0, 4              ; t0 = 4
     stw  t0, GSA (r0)           ; GSA[0][0] = 4
 
-    call create_food	          ; create apple
+    call create_food	         ; create apple
     call draw_array             ; draw board
     call display_score
 
@@ -36,7 +36,7 @@ step:
     br end_game
 not_lost:
     beq v0, r0, move            ; if v0 = 0, move
-    call create_food	          ; else (v0 = 1) create apple
+    call create_food	         ; else (v0 = 1) create apple
     ldw t0, SCORE (r0)          ; t0 = score
     addi t0, t0, 1              ; t0 = score + 1
     stw t0, SCORE (r0)          ; MEM[SCORE] = score + 1
@@ -190,8 +190,8 @@ move_snake:
     addi a1, r0, HEAD_Y     ; a1 = head_y
     addi a2, r0, 0          ; a2 = 0 (head)
     addi sp, sp, -4         ; make space on stack
-    stw  ra, 0 (sp)	      ; push ra
-    call update		    ; update head position
+    stw  ra, 0 (sp)	     ; push ra
+    call update	      ; update head position
     ldw ra, 0 (sp)          ; pop the return address
     addi sp, sp, 4          ; hand back space on stack
 
@@ -213,7 +213,7 @@ update:
     ldw t2, 0 (a1)    	    ; get y pos
 
     ; compute LED address
-    slli t0, t1, 3     	; t0 = x * 8
+    slli t0, t1, 3          ; t0 = x * 8
     add  t0, t0, t2         ; t0 = y + x * 8
     slli t0, t0, 2          ; t0 = t0 * 4
     addi t0, t0, GSA        ; t0 = GSA + t0
@@ -223,11 +223,11 @@ update:
     andi t4, t4, 15	     ; take the first 8 bits
 
     beq a2, r0, start_move  ; need to delete tail if head
-    stw	r0, 0 (t0)	    ; clear tail
+    stw	r0, 0 (t0)    ; clear tail
 start_move:
     ;compute x offset
     cmpeqi t3, t4, 4        ; if t4 = 4 then x_os = 1
-    addi t5, r0, 1	    ; t5 = 1
+    addi t5, r0, 1	     ; t5 = 1
     bne  t4, t5, update_x   ; if t4 = 1 then
     addi t3, r0, -1         ; x_os = -1
 update_x:
@@ -235,7 +235,7 @@ update_x:
     
     ;compute y offset
     cmpeqi t3, t4, 3        ; if t4 = 3 then y_os = 1
-    addi t5, r0, 2	    	; t5 = 2
+    addi t5, r0, 2	      ; t5 = 2
     bne  t4, t5, update_y   ; if t4 = 2 then
     addi t3, r0, -1         ; y_os = -1
 update_y:
