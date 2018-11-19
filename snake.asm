@@ -10,7 +10,14 @@
 .equ BUTTONS,     0x2030 ; Button addresses
 .equ EDGE_CAPT,   0x2034 ; Falling edge detection address
 
-; BEGIN:main
+idle:
+    ldw  t0, EDGE_CAPT (r0)	; t0 = edge_capture
+    andi t0, t0, 31		; t0 = edgecapture[0:5]
+    addi t4, r0, 1		; position tester
+    slli t4, t4, 4		; t4 = 0b10000
+    and  t4, t4, t0		; t4 = t0 & t4
+    beq  t4, r0, idle		; if game not reset, don't start
+    
 main:
     addi sp, r0, LEDS		; initi sp
     
@@ -57,7 +64,6 @@ move:
 end_game:
     call restart_game
     ret
-; END:main
 
 ; BEGIN: wait
 wait:
