@@ -13,6 +13,12 @@
 ; BEGIN:main
 main:
     addi sp, r0, LEDS		; initi sp
+    
+    ; init 2 left-most displays
+    addi t0, r0, 4		; t0 = 4
+    addi t1, r0, 252		; t1 = 0xFC
+    stw t1, SEVEN_SEGS (t0)	; MEM[SEVEN_SEGS + 4] = 0
+    stw t1, SEVEN_SEGS (r0)	; MEM[SEVEN_SEGS] = 0
 
     ; init snake
     stw  r0, HEAD_X (r0)	; snake head x = 0
@@ -55,15 +61,14 @@ end_game:
 
 ; BEGIN: wait
 wait:
-    addi t0, r0, 32767
-	addi t1, r0, 128
-	
-decr:
+    addi t0, r0, 32767		; t0 = 2^15 - 1
+    addi t1, r0, 128		; t1 = 128
+decr:				; loop t1 * t0 times
     addi t0, t0, -1
     bne t0, r0, decr
-	addi t0, r0, 32767
-	addi t1, t1, -1
-	bne t1, r0, decr
+    addi t0, r0, 32767
+    addi t1, t1, -1
+    bne t1, r0, decr
     ret
 ; END:wait
 
@@ -132,11 +137,11 @@ set:
     slli t3, t1, 3		; t3 = x * 8
     add  t3, t3, t2		; t3 = x * 8 + y
     slli t3, t3, 2		; t3 = t3 * 4
-	ldw  t5, GSA (t3)
-
-	addi t1, r0, 5
-	add t0, t5, t6
-	beq t0, t1, return
+    
+    ldw  t5, GSA (t3)		; t5 = GSA[x][y]
+    addi t1, r0, 5		; t1 = 5
+    add t0, t5, t6		; t0 = t5 + t6
+    beq t0, t1, return		; if t0 = 5, dont change direction
     stw  t6, GSA (t3)		; MEM[GSA + t3] = t6
 return:
     ret
@@ -226,10 +231,9 @@ update:
     slli t0, t1, 3		; t0 = x * 8
     add  t0, t0, t2		; t0 = y + x * 8
     slli t0, t0, 2		; t0 = t0 * 4
-    addi t0, t0, GSA		; t0 = GSA + t0
 	
     ; get LED value
-    ldw  t4, 0 (t0)		; t4 = GSA[x][y]
+    ldw  t4, GSA (t0)		; t4 = GSA[x][y]
     andi t4, t4, 15		; take the first 8 bits
 
     beq a2, r0, start_move	; need to delete tail if head
@@ -260,9 +264,8 @@ update_y:
     slli t0, t1, 3		; t0 = x * 8
     add  t0, t0, t2		; t0 = y + x * 8
     slli t0, t0, 2		; t0 = t0 * 4
-    addi t0, t0, GSA		; t0 = GSA + t0
 
-    stw  t4, 0 (t0)		; MEM[x][y] = t4
+    stw  t4, GSA (t0)		; MEM[x][y] = t4
 end_update:
     ret
 ; END:move_snake
@@ -310,10 +313,10 @@ upd_y:
     slli t0, t0, 2		; t0 = t0 * 4
 	
     ldw t0, GSA (t0)		; t0 = MEM[GSA + t0]
-	cmpgei t1, t0, 1        ; if t0 >= 1 then t1 = 1
-	cmplti t2, t0, 5        ; if t0 < 5 then t2 = 1
-	and t3, t1, t2          ; t3 = t2 and t1
-	bne t3, r0, end_hit
+    cmpgei t1, t0, 1		; if t0 >= 1 then t1 = 1
+    cmplti t2, t0, 5		; if t0 < 5 then t2 = 1
+    and t3, t1, t2		; t3 = t2 and t1
+    bne t3, r0, end_hit		; if snake ate itself, end game
 	
     cmpeqi v0, t0, 5		; v0 = 1 if we head on an element
 end_hit:
@@ -333,16 +336,13 @@ split:
 display:
     slli t0, t0, 2		; t0 = t0 * 4
     slli t1, t1, 2		; t1 = t1 * 4
-    addi t3, r0, 12		; t3 = 12
     ldw t0, font_data (t0)	; translate value
     ldw t1, font_data (t1)	; translate value
+    
+    addi t3, r0, 12		; t3 = 12
     stw t0, SEVEN_SEGS (t3)	; MEM[SEVEN_SEGS + 12] = score % 10
     addi t3, r0, 8		; t3 = 8
     stw t1, SEVEN_SEGS (t3)	; MEM[SEVEN_SEGS + 8] = score / 10
-    addi t0, r0, 4		; t0 = 4
-	addi t1, r0, 252
-    stw t1, SEVEN_SEGS (t0)	; MEM[SEVEN_SEGS + 4] = 0
-    stw t1, SEVEN_SEGS (r0)	; MEM[SEVEN_SEGS] = 0
     ret
 ; END:display_score
 
@@ -350,8 +350,8 @@ display:
 restart_game:
     ldw  t0, EDGE_CAPT (r0)	; t0 = edge_capture
     andi t0, t0, 31		; t0 = edgecapture[0:5]
-    addi t4, r0, 1		; position tester (= 1)
-    slli t4, t4, 4		; position tester (= 32)
+    addi t4, r0, 1		; position tester
+    slli t4, t4, 4		; t4 = 0b10000
     and  t4, t4, t0		; t4 = t0 & t4
     or   t4, t4, v0		; t4 = t4 | v0
     addi t0, r0, 2		; t0 = 2
@@ -360,15 +360,11 @@ restart_game:
 
     ; reset score and display
     addi t0, r0, 12		; t0 = 12
-	addi  t1, r0, 252
+    addi  t1, r0, 252		; t1 = 0xFC
     stw r0, SCORE (r0)		; MEM[SCORE] = 0
-
     stw t1, SEVEN_SEGS (t0)	; MEM[SEVEN_SEGS + 12] = 0
     addi t0, r0, 8		; t0 = 8
     stw t1, SEVEN_SEGS (t0)	; MEM[SEVEN_SEGS + 8] = 0
-    addi t0, r0, 4		; t0 = 4
-    stw t1, SEVEN_SEGS (t0)	; MEM[SEVEN_SEGS + 4] = 0
-    stw t1, SEVEN_SEGS (r0)	; MEM[SEVEN_SEGS] = 0
 
     ; reset GSA
     add  t3, r0, r0		; t3 = x
@@ -393,7 +389,7 @@ end_lpy_r:
     addi t3, t3, 1		; incr x
     br lpx_r			; loop on x coordinate
 end_lpx_r:
-	addi ra, r0, main
+    addi ra, r0, main
 end_reset:
     ret
 ; END:restart_game
