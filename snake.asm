@@ -17,7 +17,7 @@ idle:
     slli t4, t4, 4		; t4 = 0b10000
     and  t4, t4, t0		; t4 = t0 & t4
     beq  t4, r0, idle		; if game not reset, don't start
-    stw  r0, EDGE_CAPT (r0)	; t0 = edge_capture
+    stw  r0, EDGE_CAPT (r0)	; reset edge_capture
     
 main:
     addi sp, r0, LEDS		; initi sp
@@ -244,7 +244,7 @@ update:
     andi t4, t4, 15		; take the first 8 bits
 
     beq a2, r0, start_move	; need to delete tail if head
-    stw r0, 0 (t0)             ; clear tail
+    stw r0, GSA (t0)             ; clear tail
 start_move:
     ;compute x offset
     cmpeqi t3, t4, 4		; if t4 = 4 then x_os = 1
