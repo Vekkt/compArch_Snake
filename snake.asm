@@ -122,7 +122,7 @@ get_input:
     addi t6, r0, 1		; position (= 1)
 index:
     and  t5, t4, t0		; t5 = t4 & t0
-    bne  t5, r0, set	; if t5 != 0 we found the index
+    bne  t5, r0, set	        ; if t5 != 0 we found the index
     slli t4, t4, 1		; else shift t4 by 1 to the left
     addi t6, t6, 1		; and incr pos
     br   index
