@@ -56,9 +56,14 @@ end_game:
 ; BEGIN: wait
 wait:
     addi t0, r0, 32767
+	addi t1, r0, 128
+	
 decr:
     addi t0, t0, -1
     bne t0, r0, decr
+	addi t0, r0, 32767
+	addi t1, t1, -1
+	bne t1, r0, decr
     ret
 ; END:wait
 
@@ -117,7 +122,7 @@ get_input:
     addi t6, r0, 1		; position (= 1)
 index:
     and  t5, t4, t0		; t5 = t4 & t0
-    bne  t5, r0, set		; if t5 != 0 we found the index
+    bne  t5, r0, set	; if t5 != 0 we found the index
     slli t4, t4, 1		; else shift t4 by 1 to the left
     addi t6, t6, 1		; and incr pos
     br   index
@@ -127,6 +132,11 @@ set:
     slli t3, t1, 3		; t3 = x * 8
     add  t3, t3, t2		; t3 = x * 8 + y
     slli t3, t3, 2		; t3 = t3 * 4
+	ldw  t5, GSA (t3)
+
+	addi t1, r0, 5
+	add t0, t5, t6
+	beq t0, t1, return
     stw  t6, GSA (t3)		; MEM[GSA + t3] = t6
 return:
     ret
@@ -266,10 +276,9 @@ hit_test:
     slli t0, t1, 3		; t0 = x * 8
     add  t0, t0, t2		; t0 = y + x * 8
     slli t0, t0, 2		; t0 = t0 * 4
-    addi t0, t0, GSA		; t0 = GSA + t0
 	
     ; get LED value
-    ldw  t4, 0 (t0)		; t4 = GSA[x][y]
+    ldw  t4, GSA (t0)		; t4 = GSA[x][y]
     andi t4, t4, 15		; take the first 8 bits
 
     ;compute x offset
@@ -299,8 +308,13 @@ upd_y:
     slli t0, t1, 3		; t0 = x * 8
     add  t0, t0, t2		; t0 = y + x * 8
     slli t0, t0, 2		; t0 = t0 * 4
-
+	
     ldw t0, GSA (t0)		; t0 = MEM[GSA + t0]
+	cmpgei t1, t0, 1        ; if t0 >= 1 then t1 = 1
+	cmplti t2, t0, 5        ; if t0 < 5 then t2 = 1
+	and t3, t1, t2          ; t3 = t2 and t1
+	bne t3, r0, end_hit
+	
     cmpeqi v0, t0, 5		; v0 = 1 if we head on an element
 end_hit:
     ret
@@ -319,11 +333,16 @@ split:
 display:
     slli t0, t0, 2		; t0 = t0 * 4
     slli t1, t1, 2		; t1 = t1 * 4
-    addi t3, r0, 4		; t3 = 4
+    addi t3, r0, 12		; t3 = 12
     ldw t0, font_data (t0)	; translate value
     ldw t1, font_data (t1)	; translate value
-    stw t0, SEVEN_SEGS (r0)	; MEM[SEVEN_SEGS] = score % 10
-    stw t1, SEVEN_SEGS (t3)	; MEM[SEVEN_SEGS + 4] = score / 10
+    stw t0, SEVEN_SEGS (t3)	; MEM[SEVEN_SEGS + 12] = score % 10
+    addi t3, r0, 8		; t3 = 8
+    stw t1, SEVEN_SEGS (t3)	; MEM[SEVEN_SEGS + 8] = score / 10
+    addi t0, r0, 4		; t0 = 4
+	addi t1, r0, 252
+    stw t1, SEVEN_SEGS (t0)	; MEM[SEVEN_SEGS + 4] = 0
+    stw t1, SEVEN_SEGS (r0)	; MEM[SEVEN_SEGS] = 0
     ret
 ; END:display_score
 
@@ -332,7 +351,7 @@ restart_game:
     ldw  t0, EDGE_CAPT (r0)	; t0 = edge_capture
     andi t0, t0, 31		; t0 = edgecapture[0:5]
     addi t4, r0, 1		; position tester (= 1)
-    slli t4, t4, 5		; position tester (= 32)
+    slli t4, t4, 4		; position tester (= 32)
     and  t4, t4, t0		; t4 = t0 & t4
     or   t4, t4, v0		; t4 = t4 | v0
     addi t0, r0, 2		; t0 = 2
@@ -340,10 +359,16 @@ restart_game:
     stw  r0, EDGE_CAPT (r0)	; reset edge capture
 
     ; reset score and display
-    addi t0, r0, 4		; t0 = 4
+    addi t0, r0, 12		; t0 = 12
+	addi  t1, r0, 252
     stw r0, SCORE (r0)		; MEM[SCORE] = 0
-    stw r0, SEVEN_SEGS (r0)	; MEM[SEVEN_SEGS] = 0
-    stw r0, SEVEN_SEGS (t0)	; MEM[SEVEN_SEGS + 4] = 0
+
+    stw t1, SEVEN_SEGS (t0)	; MEM[SEVEN_SEGS + 12] = 0
+    addi t0, r0, 8		; t0 = 8
+    stw t1, SEVEN_SEGS (t0)	; MEM[SEVEN_SEGS + 8] = 0
+    addi t0, r0, 4		; t0 = 4
+    stw t1, SEVEN_SEGS (t0)	; MEM[SEVEN_SEGS + 4] = 0
+    stw t1, SEVEN_SEGS (r0)	; MEM[SEVEN_SEGS] = 0
 
     ; reset GSA
     add  t3, r0, r0		; t3 = x
