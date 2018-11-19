@@ -316,7 +316,7 @@ upd_y:
     cmpgei t1, t0, 1		; if t0 >= 1 then t1 = 1
     cmplti t2, t0, 5		; if t0 < 5 then t2 = 1
     and t3, t1, t2		; t3 = t2 and t1
-    bne t3, r0, end_hit		; if snake ate itself, end game
+    bne t3, r0, end_hit        ; if snake ate itself, end game
 	
     cmpeqi v0, t0, 5		; v0 = 1 if we head on an element
 end_hit:
