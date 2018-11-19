@@ -16,9 +16,9 @@ idle:
     addi t4, r0, 1		; position tester
     slli t4, t4, 4		; t4 = 0b10000
     and  t4, t4, t0		; t4 = t0 & t4
-    beq  t4, r0, idle		; if game not reset, don't start
-    stw  r0, EDGE_CAPT (r0)	; reset edge_capture
-    
+    beq  t4, r0, idle	; if game not reset, don't start
+    call restart_game
+
 main:
     addi sp, r0, LEDS		; initi sp
     
