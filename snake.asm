@@ -46,8 +46,7 @@ step:
     call hit_test		; check for collision
     addi t0, r0, 2		; t0 = 2
     bne  v0, t0, not_lost	; if v0 != 2, game continues
-    addi ra, r0, end_game	; ra = end_game
-    br end_game
+    call restart_game
 not_lost:
     beq v0, r0, move		; if v0 = 0, move
     call create_food		; else (v0 = 1) create apple
@@ -62,8 +61,6 @@ move:
     call wait
     call restart_game
     br step			; cycle
-end_game:
-    call restart_game
     ret
 
 ; BEGIN: wait
